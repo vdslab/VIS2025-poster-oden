@@ -1,5 +1,26 @@
-{% raw %}
-% `vgtc' LaTeX class.
+% `vgtc' LaTeX class. 
+% THIS FILE MAY NOT BE MODIFIED WITHOUT THE EXPRESS APPROVAL
+% OF THE VGTC PUBLICATIONS CHAIR (submissions@vgtc.org).
+%
+% Changelog:
+% - modifications by Matthew Brehmer on 2024/02/12
+%   - ACM CCS keywords replaced with index terms, so as to be consistent with full papers
+%   - added cleveref package and instructions for use, rather than using autoref (mirrorring full paper template)
+%     - added Supplemental Materials and Figure Credits sections at the end.
+%     - added supplemental materials instructions and goals, an example project 
+%       on OSF.
+%     - added figure credits for CypressView.
+%     - replaced paper count figure with newly-made ones.
+%     - changed cross references to point to the top of the target float, rather than the caption.
+%     - added blue hyperlink coloring, now that electronic has long been the default.
+%     - removed sample.pdf & sample.eps.
+%     - removed Google Scholar fields from template.bib.
+
+% - modifications by Cagatay Turkay and Soumya Dutta on 2019/09/11
+%   - modified the preprint article style to contain the IEEE copyright notices to produce IEEE compliant OA preprints.
+%   - included two different statements for journal and conference papers
+%   - added a new command \ieeedoi for authors to set IEEE generated DOIs on their preprints
+%   - added comments on the template.tex for preprint guidance
 % - modifications by Tobias Isenberg on 2017/07/05
 %   - updated the instructions for author footer in template.tex for the journal template
 % - modifications by Tobias Isenberg on 2017/06/14
@@ -105,6 +126,21 @@
 
 \RequirePackage{ifpdf}%
 
+%% These few lines make a distinction between latex and pdflatex calls and they
+%% bring in essential packages for graphics and font handling.
+\ifpdf%                                % if we use pdflatex
+  \pdfoutput=1\relax                   % create PDFs from pdfLaTeX
+  \pdfcompresslevel=9                  % PDF Compression
+  \pdfoptionpdfminorversion=7          % create PDF 1.7
+  \ExecuteOptions{pdftex}
+  \RequirePackage{graphicx}                % allow us to embed graphics files
+  \DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg} % for pdflatex we expect .pdf, .png, or .jpg files
+\else%                                 % else we use pure latex
+  \ExecuteOptions{dvips}
+  \RequirePackage{graphicx}                % allow us to embed graphics files
+  \DeclareGraphicsExtensions{.eps}     % for pure latex we expect eps files
+\fi%
+
 % ------------ declaration of options --------------
 
 % 'cameraready' option.
@@ -173,55 +209,20 @@
 
 \newcommand{\vgtcinsertpkg}{}
 \DeclareOption{electronic}{%
-\ifpdf%                    % if we use pdflatex
  \renewcommand{\vgtcinsertpkg}{%
-  \usepackage{hyperref}
-  \hypersetup{pdftex,
-   pagebackref=true,
-   pdfpagemode=UseNone,
-   pdftitle={\@title},
-   pdfauthor={\@author},
-   pdfsubject={VGTC Special Issue Paper for TVCG},
-   pdfkeywords={\vgtc@keywords},
-   pageanchor=true,
-   plainpages=false,       % for problems with page referencing
-   hypertexnames=false,    % for handling subfigures correctly
-   bookmarks=true,         % we want bookmarks
-   bookmarksnumbered=false,% include the section numbers in the list
-   bookmarksopen=true,     % In the list, display highest level only
-   bookmarksopenlevel=3,   % display three levels of bookmarks
-   pdfpagemode=UseNone,    % show just the page
-   pdfstartview=Fit,       % defail page view is the whole page at once
-   pdfborder={0 0 0},      % we don't want those silly boxes for links
-   breaklinks=true,        % allow breaking links
-   colorlinks=false,       % don't change coloring of links
-   nesting=true,
-   linktocpage}
+  \RequirePackage[pagebackref,bookmarks]{hyperref}
+  \RequirePackage[all]{hypcap}% makes hyperlinks go to top of floats rather than the caption
+  \RequirePackage[svgnames]{xcolor}
   
-	%% it is recomended to use ``\autoref{sec:bla}'' instead of ``Fig.~\ref{sec:bla}''
-  %% the following lines re-define the respective tags used in the \autoref calls
-  \newcommand{\subfigureautorefname}{Fig.} % in case someone uses subfigures
-  \renewcommand{\figureautorefname}{Fig.}
-  \renewcommand{\tableautorefname}{Ta\-ble}
-  \renewcommand{\chapterautorefname}{Chapter}
-  \renewcommand{\sectionautorefname}{Sect.}
-  \renewcommand{\subsectionautorefname}{Sect.}
-  \renewcommand{\subsubsectionautorefname}{Sect.}
- }
-\else%                     % else we use pure latex
- \renewcommand{\vgtcinsertpkg}{%
-  \usepackage{hyperref}
-  \hypersetup{dvips,
-   pagebackref=true,
+  \hypersetup{
    pdfpagemode=UseNone,
    pdftitle={\@title},
    pdfauthor={\@author},
-   pdfsubject={VGTC Special Issue Paper for TVCG},
+   pdfsubject={VGTC Conference Paper},
    pdfkeywords={\vgtc@keywords},
    pageanchor=true,
    plainpages=false,       % for problems with page referencing
    hypertexnames=false,    % for handling subfigures correctly
-   bookmarks=true,         % we want bookmarks
    bookmarksnumbered=false,% include the section numbers in the list
    bookmarksopen=true,     % In the list, display highest level only
    bookmarksopenlevel=3,   % display three levels of bookmarks
@@ -229,22 +230,31 @@
    pdfstartview=Fit,       % defail page view is the whole page at once
    pdfborder={0 0 0},      % we don't want those silly boxes for links
    breaklinks=true,        % allow breaking links
-   colorlinks=false,       % don't change coloring of links
+   colorlinks=true,        % color all links blue
+   linkcolor=NavyBlue,
+   urlcolor=NavyBlue,
+   citecolor=NavyBlue,
+   anchorcolor=black,      % changing this colors te teaser caption using dvips
    nesting=true,
-   linktocpage}
-  \renewcommand{\pdfbookmark}[3][]{}
+   linktocpage,
+   pdfdisplaydoctitle}
+   \ifpdf%                    % if we use pdflatex
+   \else%                     % else we use pure latex
+    \renewcommand{\pdfbookmark}[3][]{}
+   \fi
 
-	%% it is recomended to use ``\autoref{sec:bla}'' instead of ``Fig.~\ref{sec:bla}''
-  %% the following lines re-define the respective tags used in the \autoref calls
-  \newcommand{\subfigureautorefname}{Fig.} % in case someone uses subfigures
-  \renewcommand{\figureautorefname}{Fig.}
-  \renewcommand{\tableautorefname}{Ta\-ble}
-  \renewcommand{\chapterautorefname}{Chapter}
-  \renewcommand{\sectionautorefname}{Sect.}
-  \renewcommand{\subsectionautorefname}{Sect.}
-  \renewcommand{\subsubsectionautorefname}{Sect.}
+     %% it is recommended to use ``\cref{sec:bla}`` instead of ``Sec.~\ref{sec:bla}''
+  %% the following lines load cleveref for consistent, style-dependent cross-references
+  %% then customize how sections and tables are referenced. Note that both ``\crefname``
+  %% AND ``\Crefname`` must be specified for each, otherwise cleveref uses whatever is
+  %% given for both cases.
+  \RequirePackage[nameinlink,capitalise]{cleveref}
+  \crefname{table}{Tab.}{Tabs.}
+  \Crefname{table}{Table}{Tables}
+  \crefname{section}{Sec.}{Secs.}
+  \Crefname{section}{Section}{Sections}
+  
  }
-\fi
 }
 %% end of code adapted from egpubl.cls
 
@@ -331,8 +341,18 @@
 \newcommand{\vgtc@onlineid}{}
 \newcommand{\onlineid}[1]{\renewcommand{\vgtc@onlineid}{#1}}
 
-\newcommand{\vgtc@preprinttext}{To appear in IEEE Transactions on Visualization and Computer Graphics}
+%\newcommand{\vgtc@preprinttext}{To appear in IEEE Transactions on Visualization and Computer Graphics}
+%\newcommand{\preprinttext}[1]{\renewcommand{\vgtc@preprinttext}{#1}}
+
+\newcommand{\vgtc@DOI}{xx.xxxx/TVCG.201x.xxxxxxx/}
+
+\newcommand{\vgtc@preprinttext}{\parbox{0.9\textwidth}{$\copyright$ \the\year~IEEE. This is the author's version of the article that has been published in the proceedings of IEEE Visualization conference. The final version of this record is available at: \href{https://doi.org/\vgtc@DOI}{\color{blue}\vgtc@DOI}}}
+
+
+
 \newcommand{\preprinttext}[1]{\renewcommand{\vgtc@preprinttext}{#1}}
+\newcommand{\ieeedoi}[1]{\renewcommand{\vgtc@DOI}{#1}}
+
 
 \newcommand{\vgtc@reviewtext}{Online Submission ID: \vgtc@onlineid}
 \newcommand{\reviewtext}[1]{\renewcommand{\vgtc@reviewtext}{#1}}
@@ -429,7 +449,7 @@ Manuscript received xx xxx. 201x; accepted xx xxx. 201x. Date of Publication xx 
    \renewcommand{\@oddfoot}{}%
 
    \ifvgtc@preprint%
-     \renewcommand{\@oddhead}{\hfil\textit{\large\vgtc@preprinttext}\hfil}%
+     \renewcommand{\@oddhead}{\hfil\textit{\vgtc@preprinttext}\hfil}%
      \renewcommand{\@oddfoot}{\hfil\textrm{\thepage}\hfil}%
    \fi%
 
@@ -620,6 +640,8 @@ Manuscript received xx xxx. 201x; accepted xx xxx. 201x. Date of Publication xx 
 \newcommand{\vgtcformat}[1]
 {\@latex@warning{Format specification no longer required.}}
 
+\RequirePackage{etoolbox}
+
 \newcommand{\vgtc@teaser}{}
   \newcommand{\teaser}[1]{%
     \renewcommand{\vgtc@teaser}{%
@@ -795,9 +817,8 @@ Manuscript received xx xxx. 201x; accepted xx xxx. 201x. Date of Publication xx 
         \fi%
         \ifx\vgtc@keywords\vgtc@empty \else%
             \begingroup%
-                %{\normalsize\vgtc@absfont {\bfseries Keywords - } \vgtc@keywords}%
                 \vspace{0.5\baselineskip}%
-                \par\noindent \textbf{Keywords: } \vgtc@keywords%
+                \par\noindent \textbf{Index Terms: } \vgtc@keywords%
             \endgroup\par%
             %\vspace{\abstxtspace}%
         \fi%
@@ -942,7 +963,7 @@ Manuscript received xx xxx. 201x; accepted xx xxx. 201x. Date of Publication xx 
            \vspace*{3\baselineskip}%
            {Estimated \# of pages: \vgtc@estpages \par}%
            \vspace*{\baselineskip}%
-           {Keywords: \vgtc@keywords \par}%
+           {Index Terms: \vgtc@keywords \par}%
            \vspace*{\fill}%
            \begin{minipage}{5in}%
                \the\vgtc@abs
@@ -965,4 +986,4 @@ Manuscript received xx xxx. 201x; accepted xx xxx. 201x. Date of Publication xx 
 \endinput
 
 % End of file 'vgtc.cls'.
-{% endraw %}
+
