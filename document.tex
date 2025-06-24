@@ -24,7 +24,7 @@
 
 %% Paper title.
 
-\title{StoryGem-NC: A Non Convex Region Extension for Meaning Preserving Voronoi Treemap Text Visualizations}
+\title{Extending Voronoi Treemap-Based Text Visualization to Non-Convex Regions}
 
 %% This is how authors are specified in the conference style
 
@@ -50,19 +50,18 @@
 
 \teaser{
   \centering
-  \includegraphics[width=0.45\textwidth]{figs/star.png}
-  \includegraphics[width=0.45\textwidth]{figs/heart.png}
+  \includegraphics[width=0.45\textwidth]{figs/storygem_heart.png}
+  \includegraphics[width=0.45\textwidth]{figs/storygem_dog.png}
   \caption{
-    Examples of StoryGem-NC applied to non convex shapes using text from Wikipedia's Dog article: (a) star shaped region and (b) heart shaped region. The method successfully fills these complex shapes while maintaining semantic relationships between dog related terms.
+    Examples of StoryGem applied to non convex shapes using text from Wikipedia's Dog article: heart shaped region (left) and dog silhouette region (right). The method successfully fills these complex shapes while maintaining semantic relationships between dog related terms.
   }
   \label{fig:teaser}
 }
 
 \abstract{
   StoryGem is a text visualization technique that addresses WordCloud's inability to capture semantic connections and SemanticWordCloud's difficulty in efficiently filling defined areas.
-  However, StoryGem is limited to convex regions.
-  We present StoryGem-NC (non convex), an extension that enables execution on non convex regions.
-  While processing non convex regions incurs higher computational costs, our experiments confirm practical performance for web based applications.
+  However, the original StoryGem is limited to convex regions.
+  We present an extension that enables StoryGem to execute on non convex regions.
   This extension opens new possibilities for visualizations using geographical boundaries, corporate logos, and other meaningful shapes.
 }
 
@@ -81,23 +80,27 @@
 \firstsection{Introduction}
 \maketitle
 
-WordCloud is a ubiquitous text visualization method that arranges words with varying sizes to represent importance.
+WordCloud\cite{viegas2009participatory} is a ubiquitous text visualization method that arranges words with varying sizes to represent importance.
 However, traditional WordClouds use random layouts that fail to convey semantic relationships between words, limiting their analytical value for understanding text structure and meaning.
-
-SemanticWordCloud and similar approaches attempt to preserve word relationships through spatial proximity but struggle with efficiently packing words into fixed areas.
+SemanticWordCloud\cite{wu2011semantic} and similar approaches attempt to preserve word relationships through spatial proximity but struggle with efficiently packing words into fixed areas.
 This challenge becomes even more complex when dealing with non rectangular display regions.
+
+Recent advances in text visualization have explored the use of arbitrary shapes for word layouts.
 ShapeWordle~\cite{8807355} demonstrated the value of filling arbitrary shapes with words, showing that non convex region support has practical merit for creating visually engaging and contextually appropriate visualizations.
-
-StoryGem~\cite{oda2025storygemvoronoitreemapapproach} introduced a novel approach using Voronoi treemaps to create continuous layouts where area encodes importance, avoiding the overemphasis of long words while preserving semantic relationships.
+Building on these foundations, StoryGem~\cite{oda2025storygemvoronoitreemapapproach} introduced a novel approach using Voronoi treemaps to create continuous layouts where area encodes importance, avoiding the overemphasis of long words while preserving semantic relationships.
 User studies confirmed that this approach helps viewers better understand text structure and identify related concepts.
-However, StoryGem's reliance on the \texttt{d3-voronoi-treemap} library restricts it to convex polygonal display regions, limiting its applicability to real world visualization scenarios.
 
-In this paper, we present StoryGem-NC, an extension supporting arbitrary non convex domains while maintaining practical performance for web based applications.
-This advancement enables new visualization possibilities for geographic data, branded content, and educational materials.
+However, StoryGem's font size optimization algorithm requires all Voronoi cells to be convex polygons, which restricts the method to convex display regions and limits its applicability to real world visualization scenarios.
+Many practical applications require non convex shapes: geographic boundaries for regional text analysis, corporate logos for brand aligned visualizations, or thematically relevant shapes for educational materials.
+The inability to handle such shapes significantly constrains StoryGem's utility in these contexts.
+
+In this paper, we extend StoryGem to support arbitrary non convex domains through a novel font size optimization approach.
+By computing convex hulls for individual Voronoi cells and applying binary search scaling, we preserve StoryGem's sophisticated optimization while enabling compatibility with complex shapes.
+This advancement opens new visualization possibilities where the shape itself can reinforce the semantic content being displayed.
 
 \section{Method}
 
-StoryGem-NC extends the original StoryGem framework to support non convex regions through three main stages with critical modifications.
+We extend the original StoryGem framework to support non convex regions through three main stages with critical modifications.
 
 \paragraph{Building a Semantic Word Network}
 The preprocessing pipeline removes stop words and uses NLTK part of speech tagging to retain only verbs, nouns, and adjectives.
@@ -111,61 +114,58 @@ These clusters are arranged using Balzer \etal's~\cite{balzer2005voronoi} Vorono
 This process allocates cell areas proportional to word weights (typically term frequency), creating a gapless layout that can fill non convex regions while maintaining area based importance encoding.
 The key innovation is that this algorithm naturally handles non convex boundaries without modification.
 
-\paragraph{Font Size Adjustment for non convex Cells}
-The original StoryGem's font size optimization assumes convex cells, which fails for non convex regions where cells themselves may become non convex.
-Our solution adopts a more general approach: we use a uniform base font size of 10 pixels and compute each text's bounding box radius $r_0$ from its dimensions.
-For each cell, we calculate the minimum distance $r$ from the cell's centroid to any of its edges, ensuring text remains within boundaries.
-The scaling factor is determined as:
-\[
-  s = \min\left(\frac{r}{r_0}, 1\right)
-\]
-This ensures text fits within available space regardless of cell convexity.
+\paragraph{Font Size Optimization for Non Convex Cells}
+The original StoryGem's font size optimization requires all Voronoi cells to be convex polygons, which prevents its application to non convex regions.
+Our key innovation is extending this optimization to work with non convex cells.
+We compute the convex hull for each Voronoi cell and apply the original StoryGem's font size optimization algorithm to this convex hull.
+However, since the optimized font size may cause text to extend beyond the actual non convex cell boundaries, we employ a binary search algorithm to scale down the font size until the text fits entirely within the cell.
+This approach preserves the sophisticated optimization of the original StoryGem while ensuring compatibility with arbitrary cell shapes.
+The binary search efficiently finds the maximum viable font size, maintaining both readability and aesthetic quality even in complex non convex regions.
 
 
 \section{Application Examples}
 
-To demonstrate the effectiveness of our non convex extension, we applied StoryGem-NC to text data from Wikipedia's Dog article, visualizing it within star and heart shapes (Figure~\ref{fig:teaser}).
-These shapes were specifically chosen to test the method's ability to handle both sharp concave angles and smooth curves, representing the diverse geometries encountered in practical applications.
+To demonstrate the effectiveness of our non convex extension, we applied StoryGem to text data from Wikipedia's Dog article, visualizing it within a heart shape and a dog silhouette (Figure~\ref{fig:teaser}).
+These shapes were specifically chosen to test the method's ability to handle both decorative and semantically meaningful non convex regions.
 
-The star shaped visualization (Figure~\ref{fig:teaser}a) presents particular challenges due to its five sharp inward pointing vertices.
-Despite these geometric constraints, our method successfully preserves the semantic clustering of dog related terms.
-This robustness to extreme concavity is crucial for applications requiring complex shapes.
-
-The heart shaped visualization (Figure~\ref{fig:teaser}b) tests our method's handling of smooth, curved boundaries combined with a sharp inward cusp at the top.
+The heart shaped visualization tests our method's handling of smooth, curved boundaries combined with a sharp inward cusp.
 The algorithm adapts gracefully to these varying geometric properties, filling the space completely while maintaining semantic coherence.
-The smooth distribution of words across the curved boundaries demonstrates the method's versatility.
+The smooth word distribution across curved boundaries demonstrates the method's versatility.
 
-These examples reveal several key strengths of StoryGem-NC:
+The dog silhouette visualization represents a significant advancement in practical applicability.
+By successfully filling a complex dog shaped region with dog related terms from Wikipedia, we demonstrate that StoryGem can now handle semantically meaningful shapes that align with the content being visualized.
+This capability enables intuitive, context aware visualizations where the shape reinforces the subject matter.
+Successfully generating this visualization despite intricate contours (legs, tail, ears) proves our font size optimization handles highly complex non convex regions.
+
+These examples reveal several key strengths of our extended StoryGem:
 \begin{itemize}
   \item \textbf{Shape Flexibility}: The method successfully adapts to arbitrary non convex shapes without manual intervention or shape specific parameters
   \item \textbf{Semantic Preservation}: Hierarchical clustering and spatial proximity of semantically related words remain intact despite geometric constraints
-  \item \textbf{Practical Performance}: Both visualizations were generated in 5-10 seconds for datasets containing 50-100 words
   \item \textbf{Visual Quality}: Words are legibly sized and positioned, avoiding overlaps while maximizing space utilization
 \end{itemize}
 
-The successful handling of these non convex shapes suggests numerous practical applications beyond decorative visualizations.
-Geographic boundaries could visualize region specific text data, corporate logos could display company terminology, and educational materials could use meaningful shapes to enhance learning and retention.
+These results suggest numerous practical applications: geographic boundaries for regional text data, corporate logos for company terminology, and educational materials using meaningful shapes to enhance learning.
 
 \section{Conclusions}
 
-We have presented StoryGem-NC, a significant extension of the StoryGem text visualization technique that removes the constraint of convex only display regions.
-By adapting the font size adjustment algorithm and leveraging the inherent flexibility of Voronoi treemaps, we enabled meaningful text visualizations within arbitrary non convex shapes while preserving the semantic relationships that make StoryGem valuable.
+We have presented a significant extension of the StoryGem text visualization technique that removes the constraint of convex only display regions.
+By developing a novel font size optimization approach that combines convex hull computation with binary search scaling, we enabled the application of StoryGem's sophisticated optimization to non convex cells.
+This innovation allows meaningful text visualizations within arbitrary non convex shapes while preserving both the semantic relationships and the aesthetic quality that make StoryGem valuable.
 
-Our experiments with star and heart shapes demonstrate that the method successfully handles both sharp concave angles and smooth curves, maintaining semantic clustering even under challenging geometric constraints.
-The practical performance of 5-10 seconds for typical datasets (50-100 words) confirms that StoryGem-NC is suitable for interactive web applications, opening new possibilities for contextually appropriate visualizations.
+Our experiments with heart shapes and dog silhouettes demonstrate that the method successfully handles both smooth curves and complex realistic shapes, maintaining semantic clustering even under challenging geometric constraints.
+This opens new possibilities for contextually appropriate visualizations where the display shape can meaningfully relate to the content.
 
-The ability to use non convex shapes has significant implications for practical applications.
-Geographic boundaries can now be used to visualize region specific text data, with words filling the actual shape of countries, states, or districts.
-Corporate logos can display company related terminology, creating branded visualizations that reinforce visual identity.
-Educational materials can leverage meaningful shapes—such as a brain for neuroscience terms or a leaf for botanical vocabulary—to create memorable, context appropriate visualizations.
+Non convex shape support has significant practical implications.
+Geographic boundaries can visualize region specific text data within actual country, state, or district shapes.
+Corporate logos can display company terminology in branded visualizations.
+Educational materials can use meaningful shapes—brain for neuroscience terms, leaf for botanical vocabulary—creating memorable, context appropriate visualizations.
 
-However, several challenges remain for future work.
-First, the current font size adjustment strategy, while functional for non convex cells, lacks the optimization elegance of the original convex only approach.
-Developing more sophisticated optimization techniques for non convex cells represents an important research direction.
-Second, the current implementation requires predefined polygon shapes; a more flexible system would allow users to import arbitrary shapes from image files and handle complex topologies including regions with holes.
-Finally, while our performance is acceptable for moderate sized datasets, scaling to larger corpora may require algorithmic optimizations or GPU acceleration.
+Several challenges remain for future work.
+The current implementation requires predefined polygon shapes; a more flexible system would allow importing arbitrary shapes from image files and handling complex topologies with holes.
+Extending to disconnected regions or shapes with internal voids would further broaden applicability.
+Future work could explore more sophisticated text placement algorithms within non convex cells.
 
-Despite these limitations, StoryGem-NC represents a meaningful step toward more flexible and expressive text visualizations.
+Despite these limitations, this extension of StoryGem represents a meaningful step toward more flexible and expressive text visualizations.
 By enabling semantic word layouts within non convex shapes, we provide designers and analysts with new tools for creating visualizations that are both informative and visually aligned with their content's context.
 
 \bibliographystyle{abbrv-doi}
