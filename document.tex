@@ -80,14 +80,14 @@
 \firstsection{Introduction}
 \maketitle
 
-WordCloud\cite{viegas2009participatory} is a ubiquitous text visualization method that arranges words with varying sizes to represent importance.
+WordCloud~\cite{viegas2009participatory} is a ubiquitous text visualization method that arranges words with varying sizes to represent importance.
 However, traditional WordClouds use random layouts that fail to convey semantic relationships between words, limiting their analytical value for understanding text structure and meaning.
-SemanticWordCloud\cite{wu2011semantic} and similar approaches attempt to preserve word relationships through spatial proximity but struggle with efficiently packing words into fixed areas.
+SemanticWordCloud~\cite{wu2011semantic} and similar approaches attempt to preserve word relationships through spatial proximity but struggle with efficiently packing words into fixed areas.
 This challenge becomes even more complex when dealing with non rectangular display regions.
 
 Recent advances in text visualization have explored the use of arbitrary shapes for word layouts.
 ShapeWordle~\cite{8807355} demonstrated the value of filling arbitrary shapes with words, showing that non convex region support has practical merit for creating visually engaging and contextually appropriate visualizations.
-Building on these foundations, StoryGem~\cite{oda2025storygemvoronoitreemapapproach} introduced a novel approach using Voronoi treemaps to create continuous layouts where area encodes importance, avoiding the overemphasis of long words while preserving semantic relationships.
+Building on these foundations, StoryGem~\cite{oda2025storygem} introduced a novel approach using Voronoi treemaps to create continuous layouts where area encodes importance, avoiding the overemphasis of long words while preserving semantic relationships.
 User studies confirmed that this approach helps viewers better understand text structure and identify related concepts.
 
 However, StoryGem's font size optimization algorithm requires all Voronoi cells to be convex polygons, which restricts the method to convex display regions and limits its applicability to real world visualization scenarios.
@@ -102,19 +102,19 @@ This advancement opens new visualization possibilities where the shape itself ca
 
 We extend the original StoryGem framework to support non convex regions through three main stages with critical modifications.
 
-\paragraph{Building a Semantic Word Network}
+\textbf{Building a Semantic Word Network}:
 The preprocessing pipeline removes stop words and uses NLTK part of speech tagging to retain only verbs, nouns, and adjectives.
 Word embeddings are extracted using a pretrained FastText model (157 languages, trained on CommonCrawl and Wikipedia), ensuring broad language coverage and semantic quality.
 A $k$-nearest neighbor graph is constructed by computing cosine similarity between word pairs, creating a network that reflects semantic structure.
 This network forms the foundation for subsequent clustering and layout operations.
 
-\paragraph{Hierarchical Clustering and Voronoi Treemap Layout}
+\textbf{Hierarchical Clustering and Voronoi Treemap Layout}:
 The Louvain method detects communities in the word network, creating reproducible hierarchical clusters that group semantically related terms.
 These clusters are arranged using Balzer \etal's~\cite{balzer2005voronoi} Voronoi treemap algorithm, which performs iterative centroidal Voronoi tessellation.
 This process allocates cell areas proportional to word weights (typically term frequency), creating a gapless layout that can fill non convex regions while maintaining area based importance encoding.
 The key innovation is that this algorithm naturally handles non convex boundaries without modification.
 
-\paragraph{Font Size Optimization for Non Convex Cells}
+\textbf{Font Size Optimization for Non Convex Cells}:
 The original StoryGem's font size optimization requires all Voronoi cells to be convex polygons, which prevents its application to non convex regions.
 Our key innovation is extending this optimization to work with non convex cells.
 We compute the convex hull for each Voronoi cell and apply the original StoryGem's font size optimization algorithm to this convex hull.
