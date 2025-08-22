@@ -50,10 +50,9 @@
 
 \teaser{
   \centering
-  \includegraphics[width=0.45\textwidth]{figs/storygem_heart.png}
-  \includegraphics[width=0.45\textwidth]{figs/storygem_dog.png}
+  \includegraphics[width=0.9\textwidth]{figs/teaser.png}
   \caption{
-    Examples of StoryGem applied to non convex shapes using text from Wikipedia's Dog article: heart shaped region (left) and dog silhouette region (right). The method successfully fills these complex shapes while maintaining semantic relationships between dog related terms.
+    Examples of StoryGem applied to non convex shapes: "V", "I", "S" letters in rounded pop-style font filled with visualization-related text (left), and Austria's geographical boundary filled with text from Wikipedia's Austria article (right). The method successfully fills these complex shapes while maintaining semantic relationships between related terms.
   }
   \label{fig:teaser}
 }
@@ -121,30 +120,31 @@ We compute the convex hull for each Voronoi cell and apply the original StoryGem
 However, since the optimized font size may cause text to extend beyond the actual non convex cell boundaries, we employ a binary search algorithm to scale down the font size until the text fits entirely within the cell.
 This approach preserves the sophisticated optimization of the original StoryGem while ensuring compatibility with arbitrary cell shapes.
 The binary search efficiently finds the maximum viable font size, maintaining both readability and aesthetic quality even in complex non convex regions.
+The complete implementation is available at \url{https://github.com/vdslab/storygem}.
 
 
 \section{Application Examples}
 
-To demonstrate the effectiveness of our non convex extension, we applied StoryGem to text data from Wikipedia's Dog article, visualizing it within a heart shape and a dog silhouette (Figure~\ref{fig:teaser}).
-These shapes were specifically chosen to test the method's ability to handle both decorative and semantically meaningful non convex regions.
+To demonstrate the effectiveness of our non convex extension, we applied StoryGem to diverse text datasets using various non convex shapes (Figure~\ref{fig:teaser}).
+These examples were specifically chosen to test the method's ability to handle typographic and geographical non convex regions.
 
-The heart shaped visualization tests our method's handling of smooth, curved boundaries combined with a sharp inward cusp.
-The algorithm adapts gracefully to these varying geometric properties, filling the space completely while maintaining semantic coherence.
-The smooth word distribution across curved boundaries demonstrates the method's versatility.
+The "V", "I", "S" letter visualizations (Figure~\ref{fig:teaser}, left) showcase typographic applications using the VisPub dataset~\cite{Isenberg:2017:VMC}, which contains metadata about IEEE VIS conference publications from 1990 to 2024.
+We extracted abstracts from papers published in the three main VIS conferences: VAST, InfoVis, and SciVis, using each conference's abstracts to fill the corresponding letters "V", "I", and "S" respectively.
+These rounded pop-style letters demonstrate our method's capability to handle multiple connected non convex shapes simultaneously.
+The algorithm successfully fills each letter while maintaining semantic coherence across visualization terminology from each conference domain.
+The smooth, curved boundaries of the pop-style font test our font size optimization algorithm's ability to handle organic typographic forms, proving that the method can create educational materials where the shape itself conveys meaning—in this case, spelling "VIS" while displaying relevant visualization content from the respective conference tracks.
 
-The dog silhouette visualization represents a significant advancement in practical applicability.
-By successfully filling a complex dog shaped region with dog related terms from Wikipedia, we demonstrate that StoryGem can now handle semantically meaningful shapes that align with the content being visualized.
-This capability enables intuitive, context aware visualizations where the shape reinforces the subject matter.
-Successfully generating this visualization despite intricate contours (legs, tail, ears) proves our font size optimization handles highly complex non convex regions.
+The Austria geographical boundary example (Figure~\ref{fig:teaser}, right) demonstrates practical applications for regional text analysis using text from Wikipedia's Austria article.
+The complex coastlines and internal boundaries test our algorithm's robustness with real-world geographical data, successfully handling intricate contours and narrow regions.
 
 These examples reveal several key strengths of our extended StoryGem:
 \begin{itemize}
-  \item \textbf{Shape Flexibility}: The method successfully adapts to arbitrary non convex shapes without manual intervention or shape specific parameters
-  \item \textbf{Semantic Preservation}: Hierarchical clustering and spatial proximity of semantically related words remain intact despite geometric constraints
-  \item \textbf{Visual Quality}: Words are legibly sized and positioned, avoiding overlaps while maximizing space utilization
+  \item \textbf{Shape Flexibility}: The method successfully adapts to arbitrary non convex shapes including geographical boundaries, organic forms, and typographic elements without manual intervention or shape specific parameters
+  \item \textbf{Semantic Preservation}: Hierarchical clustering and spatial proximity of semantically related words remain intact despite geometric constraints across diverse content types
+  \item \textbf{Visual Quality}: Words are legibly sized and positioned, avoiding overlaps while maximizing space utilization even in challenging shapes with narrow regions
+  \item \textbf{Content Alignment}: The ability to match shape semantics with content (Austria shape with Austria content) creates more meaningful and memorable visualizations
 \end{itemize}
 
-These results suggest numerous practical applications: geographic boundaries for regional text data, corporate logos for company terminology, and educational materials using meaningful shapes to enhance learning.
 
 \section{Conclusions}
 
@@ -152,7 +152,7 @@ We have presented a significant extension of the StoryGem text visualization tec
 By developing a novel font size optimization approach that combines convex hull computation with binary search scaling, we enabled the application of StoryGem's sophisticated optimization to non convex cells.
 This innovation allows meaningful text visualizations within arbitrary non convex shapes while preserving both the semantic relationships and the aesthetic quality that make StoryGem valuable.
 
-Our experiments with heart shapes and dog silhouettes demonstrate that the method successfully handles both smooth curves and complex realistic shapes, maintaining semantic clustering even under challenging geometric constraints.
+Our experiments with typographic forms and geographical boundaries demonstrate that the method successfully handles diverse non convex shapes including smooth curves, complex realistic contours, and intricate geographical features, maintaining semantic clustering even under challenging geometric constraints.
 This opens new possibilities for contextually appropriate visualizations where the display shape can meaningfully relate to the content.
 
 Non convex shape support has significant practical implications.
